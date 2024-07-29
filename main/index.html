@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>SDCP Test Client</title>
+		<link rel="stylesheet" href="res.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">		
+	</head>
+
+	<!-- Templates -->
+	<div class="Template Printer">
+		<div class="Tools">
+			<i class="fa-solid fa-spinner   PrinterNetwork"></i>
+			<i class="fa-solid fa-folder    PrinterFiles"></i>
+			<i class="fa-solid fa-clipboard PrinterTasks"></i>
+			<i class="fa-solid fa-camera    PrinterCamera"></i>
+		</div>
+		<img src="printers/{{image}}" />
+		<span>{{name}}</span>
+		<span>{{ip}}</span>
+		<span>{{status}}</span>
+		<div class="Upload"><div class="Uploaded"></div></div>
+	</div>
+
+	<body>
+		<i class = "fa-solid fa-refresh Discover"></i>
+
+		<div class="Camera">
+			<img src="" />
+			<!-- a spinning spinner -->
+			<i class="fa-solid fa-spinner"></i>
+		</div>		
+
+		<div class="Files">
+			<i class="fa-solid fa-spinner"></i>
+			<div class="Header"><span>/local</span><i class="root fa-solid fa-circle-arrow-left Back"></i><i class="root fa-solid fa-close Close"></i></div>
+			<ul class="List">
+				<li class="Item">
+					<i class="fa-solid fa-folder"></i>
+					<span>File 1</span>
+					<i class="fa-solid fa-trash"></i>
+
+				</li>
+				<li class="Item">
+					<i class="fa-solid fa-folder"></i>
+					<span>File 1</span>
+					<i class="fa-solid fa-trash"></i>
+
+				</li>
+				<li class="Item">
+					<i class="fa-solid fa-file"></i>
+					<span>File 1</span>
+
+				</li>								
+			</ul>
+		</div>
+
+		<div class="Printers">
+		</div>
+	</body>
+
+	<script src="renderer.js"></script>
+
+</html>

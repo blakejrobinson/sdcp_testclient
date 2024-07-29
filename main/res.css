@@ -1,0 +1,434 @@
+*
+{
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+	font-family: poppins;
+}
+
+@keyframes spinner 
+{
+	0%   { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+html {
+	height: 100%;
+}
+body
+{
+	background-color: #333;
+	color: white;
+	display: flex;
+    justify-content: center;
+    align-items: center;
+	height: 100%;
+	overflow: hidden;
+}
+
+.Template
+{
+	display: none;
+}
+
+.Discover
+{
+	cursor: pointer;
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	text-shadow: 0px 0px 5px rgba(0,0,0,0.7s);
+}
+
+/*Spin*/
+.Discover.Discovering
+{
+	animation: spinner 1s linear infinite;
+}
+
+.Printers
+{
+	width: calc(100% - 40px);
+	height: calc(100% - 40px);
+
+	/* padding: 10px; */
+	background-color: #444;
+	box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+	border-radius: 10px;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    /* justify-content: flex-start; */
+    justify-content: center;
+    align-content: center;
+    overflow-y: auto;
+
+	min-height: 170px;
+}
+
+	.Printers .Printer
+	{
+		position: relative;
+
+		margin: 5px;
+		padding: 5px;
+		/* border: 1px solid #666; */
+		width: 130px;
+		height: 170px;
+		display: flex;
+		/* justify-content: end; */
+		flex-direction: column;
+		align-items: center;
+		overflow: hidden;
+		flex-shrink: 0;
+		border-radius: 10px;
+		cursor: pointer;		
+	}
+
+	@keyframes flashborder 
+	{
+		0%   { outline: 1px solid rgba(255,255,255,0.0);}
+		50%  { outline: 1px solid rgba(255,255,255,0.2);}
+		100% { outline: 1px solid rgba(255,255,255,0.0);}
+	}	
+
+	/*Throbbing text opacity/color effect on hover*/
+	@keyframes throb 
+	{
+		0%   { color: rgba(255,255,255,0.33); }
+		50%  { color: rgba(255,255,255,0.5); }
+		100% { color: rgba(255,255,255,0.33); }
+	}
+
+	/* Scrolling ticker */
+	@keyframes ticker 
+	{
+		0%   { transform: translateY(0); }
+		100% { transform: translateY(-100%); }
+	}
+
+	.Printers .Printer:hover
+	{
+		background-color: rgba(128,128,128,0.2);
+		transition: background-color 0.1s ease-in-out;
+		animation: flashborder 0.3s ease-out;
+	}
+
+	.Printers .Printer img
+	{
+		flex-grow: 1;
+		width: 100%;
+		height: auto;
+		object-fit: contain;
+	}
+
+	.Printer.Inactive
+	{
+		opacity: 0.34;
+	}
+	.Printer.Printing span:nth-of-type(3)
+	{
+		animation: throb 1s infinite;
+	}
+
+	@keyframes hop 
+	{
+		0%   { transform: translateY(0); }
+		50%  { transform: translateY(-3px); }
+		100% { transform: translateY(0); }
+	}
+	
+	@keyframes smallhop 
+	{
+		0%   { transform: translateY(0); }
+		50%  { transform: translateY(-1.5px); }
+		100% { transform: translateY(0); }
+	}
+
+	.Printers .Printer:hover img
+	{
+		animation: hop 0.3s ease-out;
+	}	
+
+	.Printers .Printer.DragDrop
+	{
+		outline: 1px dashed #888;
+	}
+
+	.Printers .Printer span
+	{
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: calc(100% - 2px);
+	}
+	.Printers .Printer span:nth-of-type(1) {font-size: 0.8em;}
+	.Printers .Printer span:nth-of-type(2),
+	.Printers .Printer span:nth-of-type(3)
+	{
+		font-size: 0.7em; 
+		color: #999;
+		/* opacity: 0.33; */
+	}
+	.Printers .Printer:hover       span:nth-of-type(3),
+	.Printers .Printer:not(:hover) span:nth-of-type(2)
+	{
+		display: none;
+	}
+	
+	.Printers .Tools
+	{
+		display: flex;
+		flex-direction: column;
+		position: absolute;
+		align-items: center;
+		top: 0px;
+		right: 5px;
+		font-size: 0.8em;
+	}
+	.Printers .Printer:not(:hover) .Tools  i:not(:first-child)
+	{
+		display: none;
+	}
+
+		.Printers .Tools i
+		{
+			cursor: pointer;
+			padding: 5px;
+			color: rgba(255,255,255,0.8);
+		}
+
+		.Printers .Tools i.Loading
+		{
+			pointer-events: none;
+			opacity: 0.5;
+		}
+
+		.Printers .Tools i:hover
+		{
+			color: rgba(255,255,255,1);
+			animation: smallhop 0.1s ease-out;
+		}
+
+		.Printers .Tools .PrinterNetwork
+		{
+			text-indent: 0px;
+			padding-top: 3px;
+		}
+
+		.Printers .Tools .PrinterNetwork.fa-spinner
+		{
+			animation: spinner 1s linear infinite;
+			opacity: 0.5;
+		}
+		.Printers .Tools .PrinterNetwork.Connected
+		{
+			color: #0f0;
+		}
+
+		.Printers .Printer:not(.Uploading) .Upload
+		{
+			display: none;
+		}
+		.Printers .Printer .Upload
+		{
+			position: absolute;
+			top: 5px;
+			left: calc(50% - 20px);
+			width: 40px;
+			background-color: rgba(90,90,90,0.9);
+			box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.5);
+			height: 10px;
+			border-radius: 4px;
+			z-index: 100;
+			overflow: hidden;
+		}
+
+		.Printers .Printer .Upload>.Uploaded
+		{
+			height: 100%;
+			/* width: 50%; */
+			background-color: rgba(255,255,255,0.6);
+		}
+
+.Camera
+{
+	background-color: rgb(33, 33, 33, 0.9);
+	position: fixed;
+	left: 10px;
+	top: -100%;
+	height: calc(100% - 10px);
+	overflow: hidden;
+	width: calc(100% - 20px);
+	/*  */
+	z-index: 100;
+	border-radius: 0px 0px 10px 10px;
+	backdrop-filter: blur(3px);
+	padding: 0px;
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.Camera.Open
+{
+	top: 0px;
+	transition: top 0.3s ease-in-out;
+	cursor: pointer;
+}
+
+	.Camera.Loading img
+	{
+		display: none;
+	}
+	.Camera:not(.Loading) i
+	{
+		display: none;
+	}	
+	.Camera i.fa-spinner
+	{
+		animation: spinner 1s linear infinite;
+		color: rgba(255,255,255,0.5);
+	}
+
+	.Camera img
+	{
+		/* border: 1px solid red; */
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+.Files
+{
+	background-color: rgb(33, 33, 33, 0.9);
+	position: fixed;
+	top: 10px;
+	height: calc(100% - 20px);
+	min-width: 50%;
+	overflow: hidden;
+	max-width: 50%;
+	right: calc(0px - 50%);
+	/*  */
+	z-index: 100;
+	border-radius: 10px 0px 0px 10px;
+	backdrop-filter: blur(3px);
+	padding: 0px;
+	transition: right 0.12s ease-in-out;
+
+	box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+}
+
+.Files.Open
+{
+	right: 0px;
+	transition: right 0.3s ease-in-out;
+}
+
+	.Files i.fa-spinner
+	{
+		position: absolute;
+		animation: spinner 1s linear infinite;
+		color: rgba(255,255,255,0.5);
+		z-index: 1000;
+		left: calc(50% - 8px);
+		top:  calc(50% - 8px);
+	}
+
+	.Files:not(.Loading) i.fa-spinner
+	{
+		display: none;
+	}
+
+	.Files .Header
+	{		
+		padding: 10px;
+		background-color: rgba(255,255,255,0.1);
+		display: flex;
+	}
+		.Files .Header span
+		{
+			flex-grow: 1;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		.Files .Header i
+		{
+			cursor: pointer;
+			transform: translateY(4px);
+		}
+		.Files .Header i.Back
+		{
+			margin-right: 10px;
+		}
+		.Files .Header i.Back.root
+		{
+			display: none;
+		}
+
+	.Files .List
+	{
+		width: calc(100% - 20px);
+		height: 100%;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		color: rgba(255,255,255,0.8);
+		overflow-x: hidden;
+		overflow-y: auto;
+		white-space: nowrap;
+		margin: 20px;
+		margin-top: 5px;
+
+		/* border-radius: 6px; */
+		/* background-color: rgba(255,255,255,0.4); */
+	}
+
+	.Files.Loading
+	{
+		pointer-events: none;
+	}
+	.Files.Loading .List
+	{
+		opacity: 0.4;
+	}	
+
+		.Files .List .Item
+		{
+			display: flex;
+			cursor: pointer;
+			text-overflow: ellipsis;
+			align-items: center;
+		}
+		.Files .List .Item:hover
+		{
+			animation: smallhop 0.1s ease-out;
+			color: rgba(255,255,255,1);
+		}
+
+		.Files .List .Item span
+		{
+			flex-grow: 1;
+			/* border: 1px solid red; */
+			overflow: hidden;
+			text-overflow: ellipsis	;
+			/* max-width: calc(100% - 40px); */
+		}
+
+		.Files .List .Item i
+		{
+			flex-shrink: 0;
+			min-width: 20px;
+		}
+
+		.Files .List .Item:not(:hover) i
+		{
+			display: none;
+		}
+		.Files .List .Item.Confirm i.fa-trash
+		{
+			color: red;
+		}
