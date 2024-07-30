@@ -15,7 +15,7 @@ npm i
 npm run start
 ```
 
-One running, press the refresh icon (top right) to discover printers on the network.
+Once running, press the refresh icon (top right) to discover printers on the network.
 
 ### Features
 
