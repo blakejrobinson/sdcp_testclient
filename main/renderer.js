@@ -174,12 +174,12 @@ async function AddPrinter(Printer)
 					return;
 				}
 
-				TransferFile(PrinterDIV, Printer, file.path);
+				TransferFile(PrinterDIV, Printer, file.path);				
 			}
 
 		}, false);
 	}
-	if (Printer.ProtocolVersion === "V3.0.0") 
+	//if (Printer.ProtocolVersion === "V3.0.0") 
 		SetupDragDrop(PrinterDIV);
 
 	//Update status (broadcast for quick one)
@@ -229,7 +229,17 @@ async function AddPrinter(Printer)
 				case SDCP.Constants.SDCP_MACHINE_STATUS.IDLE:
 					PrinterDIV.SetStatus("Idling");
 					break;
-				case SDCP.Constants.SDCP_MACHINE_STATUS.PRINTING:					
+				case SDCP.Constants.SDCP_MACHINE_STATUS.PRINTING:	
+
+					if (Status.PrintInfo && Status.PrintInfo.TotalLayer)
+					{
+						let PrintAmount = parseInt(Status.PrintInfo.CurrentLayer / Status.PrintInfo.TotalLayer * 100);
+						PrinterDIV.querySelector(".Printer .Printed").style.width = PrintAmount + "%";								
+						PrinterDIV.querySelector(".Printer .Printed").title = PrintAmount + "% printed " + Status.PrintInfo.Filename;
+					}
+					else
+						PrinterDIV.querySelector(".Printer .Printing").style.width = undefined;
+
 					PrinterDIV.SetStatus("Printing", Status.PrintInfo.Status === SDCP.Constants.SDCP_PRINT_STATUS.FILE_CHECKING  ? "(Checking)" 
 												   : Status.PrintInfo.Status === SDCP.Constants.SDCP_PRINT_STATUS.COMPLETE 		? "(Complete)"
 												   : Status.PrintInfo.Status === SDCP.Constants.SDCP_PRINT_STATUS.DROPPING 		? "(Dropping)"
@@ -244,6 +254,11 @@ async function AddPrinter(Printer)
 					break;
 				case SDCP.Constants.SDCP_MACHINE_STATUS.FILE_TRANSFERRING:
 					PrinterDIV.SetStatus("Uploading");
+					if (Status.FileTransferInfo && Status.FileTransferInfo.FileTotalSize)
+					{
+						let UploadedAmount = parseInt(Status.FileTransferInfo.DownloadOffset / Status.FileTransferInfo.FileTotalSize * 100);
+						PrinterDIV.querySelector(".Uploaded").style.width = UploadedAmount + "%";
+					}
 					break;					
 				default:
 					PrinterDIV.SetStatus(`Unknown (${Status.CurrentStatus[0]})`);
@@ -352,17 +367,41 @@ async function TransferFile(PrinterDIV, Printer, File, Callback)
 {
 	try
 	{
+		//V1.0.0 needs HTTP server
+		var Tempfilename;
+		if (Printer.ProtocolVersion === "V1.0.0")
+		{
+			//Start a server
+			const minihttp = require('./minihttp');
+			const crypto = require('crypto');
+			Tempfilename = crypto.randomBytes(16).toString('hex') + ".ctb";
+			var server = new minihttp();
+			server.Listen(undefined, File, Tempfilename, ()=>
+			{
+				console.log(`File sent to printer ${Printer.Name} at ${Printer.MainboardIP}. Closing HTTP server`);
+				//Close the server
+				server.Close();
+				server = undefined;
+			});
+			console.log(`HTTP Server ready  on port ${server.Port}`);
+		}
+		
 		//Upload the file
 		console.log(`Uploading ${File}`);
 		PrinterDIV.querySelector(".Uploaded").style.width = undefined;
-		var result = await Printer.UploadFile(File, {ProgressCallback: 
-		
-		//Progress update
-		(progress)=>
+		var result = await Printer.UploadFile(File, 
 		{
-			let UploadedAmount = parseInt(progress.Offset / progress.TotalSize * 100);
-			PrinterDIV.querySelector(".Uploaded").style.width = UploadedAmount + "%";
-		}});
+			URL: Printer.ProtocolVersion !== "V1.0.0" ? undefined 
+													  : `http://$\{ipaddr\}:${server.Port}/${Tempfilename}`,
+		
+			//Progress update
+			ProgressCallback: 
+			(progress)=>
+			{
+				console.log(progress);
+				let UploadedAmount = parseInt(progress.Offset / progress.TotalSize * 100);
+				PrinterDIV.querySelector(".Uploaded").style.width = UploadedAmount + "%";
+			}});
 
 		//All done
 		console.log(result);
