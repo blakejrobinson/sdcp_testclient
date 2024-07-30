@@ -9,6 +9,7 @@ It is not pretty (does not sandbox) but it's purely to test features and demonst
 #### Features
 
 - Discovery, address book and printer status monitoring,
-- Camera capture (V3.0.0)
-- File browsing and uploading (V3.0.0)
+- File uploading,
+- Camera capture (V3.0.0),
+- File browsing (V3.0.0),
 - Start printing from browser (V3.0.0)
