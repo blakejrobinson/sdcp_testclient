@@ -17,6 +17,8 @@ npm run start
 
 Once running, press the refresh icon (top right) to discover printers on the network.
 
+Hover the mouse over a printer for options.
+
 ### Features
 
 - Discovery, address book and printer status monitoring,
