@@ -366,34 +366,13 @@ async function GetFiles(Printer, path)
 async function TransferFile(PrinterDIV, Printer, File, Callback)
 {
 	try
-	{
-		//V1.0.0 needs HTTP server
-		var Tempfilename;
-		if (Printer.ProtocolVersion === "V1.0.0")
-		{
-			//Start a server
-			const minihttp = require('./minihttp');
-			const crypto = require('crypto');
-			Tempfilename = crypto.randomBytes(16).toString('hex') + ".ctb";
-			var server = new minihttp();
-			server.Listen(undefined, File, Tempfilename, ()=>
-			{
-				console.log(`File sent to printer ${Printer.Name} at ${Printer.MainboardIP}. Closing HTTP server`);
-				//Close the server
-				server.Close();
-				server = undefined;
-			});
-			console.log(`HTTP Server ready  on port ${server.Port}`);
-		}
-		
+	{	
 		//Upload the file
 		console.log(`Uploading ${File}`);
 		PrinterDIV.querySelector(".Uploaded").style.width = undefined;
 		var result = await Printer.UploadFile(File, 
 		{
-			URL: Printer.ProtocolVersion !== "V1.0.0" ? undefined 
-													  : `http://$\{ipaddr\}:${server.Port}/${Tempfilename}`,
-		
+			
 			//Progress update
 			ProgressCallback: 
 			(progress)=>
