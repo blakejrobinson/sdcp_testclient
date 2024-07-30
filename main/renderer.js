@@ -254,11 +254,11 @@ async function AddPrinter(Printer)
 					break;
 				case SDCP.Constants.SDCP_MACHINE_STATUS.FILE_TRANSFERRING:
 					PrinterDIV.SetStatus("Uploading");
-					if (Status.FileTransferInfo && Status.FileTransferInfo.FileTotalSize)
+					/*if (Status.FileTransferInfo && Status.FileTransferInfo.FileTotalSize)
 					{
 						let UploadedAmount = parseInt(Status.FileTransferInfo.DownloadOffset / Status.FileTransferInfo.FileTotalSize * 100);
 						PrinterDIV.querySelector(".Uploaded").style.width = UploadedAmount + "%";
-					}
+					}*/
 					break;					
 				default:
 					PrinterDIV.SetStatus(`Unknown (${Status.CurrentStatus[0]})`);
@@ -407,7 +407,8 @@ async function TransferFile(PrinterDIV, Printer, File, Callback)
 		console.log(result);
 		if (typeof Callback === "function") 
 			Callback(result);
-		GetFiles(Printer, "/local");
+		if (Printer.ProtocolVersion === "V3.0.0")
+			GetFiles(Printer, "/local");
 	}
 	catch(err)
 	{
