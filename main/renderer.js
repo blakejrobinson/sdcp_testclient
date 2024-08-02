@@ -17,7 +17,7 @@ document.querySelector(".Discover").addEventListener("click", function (e)
 	
 	this.classList.add("Discovering");
 	//Discover, timeout 500, callback per-device
-	SDCP.SDCPDiscovery({timeout: 5000, callback: 
+	SDCP.SDCPDiscovery({Timeout: 5000, Callback: 
 	
 	//Each device
 	device=>
@@ -61,7 +61,7 @@ function cloneTemplate(templateId, data)
 
 /** Add a printer to the page
  * @param {SDCP.SDCPPrinter} Printer - The printer to add
- * The printer will be set to autoconnect and automatically connect. Status will be shown, etc.
+ * The printer will be set to autoreconnect and automatically connect. Status will be shown, etc.
  */
 async function AddPrinter(Printer)
 {
@@ -205,7 +205,7 @@ async function AddPrinter(Printer)
 	Printer.on("reconnected",    () => {PrinterDIV.SetNetwork("Reconnected");});
 
 	//Connect to it
-	Printer.AutoConnect = true;
+	Printer.AutoReconnect = true;
 	Printer.Connect().then(async () =>
 	{
 		console.log(`Connected to printer ${Printer.Name} at ${Printer.MainboardIP}`);
