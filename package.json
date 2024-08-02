@@ -11,7 +11,7 @@
   "description": "",
   "dependencies": {
     "async": "^3.2.5",
-    "sdcp": "^0.5.2"
+    "sdcp": "^0.5.3"
   },
   "devDependencies": {
     "electron": "^31.3.0"

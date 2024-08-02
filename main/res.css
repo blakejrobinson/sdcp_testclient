@@ -126,6 +126,7 @@ body
 	.Printer.Inactive
 	{
 		opacity: 0.34;
+		pointer-events: none;
 	}
 	.Printer.Printing span:nth-of-type(3)
 	{
@@ -234,14 +235,14 @@ body
 		.Printers .Printer .Upload
 		{
 			position: absolute;
-			top: 5px;
+			top: calc(33% - 5px);
 			left: calc(50% - 20px);
 			width: 40px;
 			background-color: rgba(90,90,90,0.9);
 			box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.5);
 			height: 10px;
 			border-radius: 4px;
-			z-index: 100;
+			z-index: 50;
 			overflow: hidden;
 		}
 		.Printers .Printer .Upload>.Uploaded
@@ -258,14 +259,14 @@ body
 		.Printers .Printer .Printing
 		{
 			position: absolute;
-			top: 5px;
+			top: calc(33% - 5px);
 			left: calc(50% - 20px);
 			width: 40px;
 			background-color: rgba(90,90,90,0.9);
 			box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.5);
 			height: 10px;
 			border-radius: 4px;
-			z-index: 100;
+			z-index: 50;
 			overflow: hidden;
 		}		
 		.Printers .Printer .Printing>.Printed
@@ -447,7 +448,7 @@ body
 			min-width: 20px;
 		}
 
-		.Files .List .Item:not(:hover) i
+		.Files .List .Item:not(:hover) i:not(.Icon)
 		{
 			display: none;
 		}

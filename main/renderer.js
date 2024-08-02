@@ -65,9 +65,10 @@ function cloneTemplate(templateId, data)
  */
 async function AddPrinter(Printer)
 {
-	console.log(Printer);
-	var PrinterDIV = cloneTemplate(".Template.Printer", {Name: Printer.Name, IP: Printer.MainboardIP, Status: "Unknown", Image: ((Printer.BrandName||"")+Printer.MachineName).replace(/ /g,"") + ".png"});
+	var PrinterDIV = cloneTemplate(".Template.Printer", {Name: Printer.Name, IP: Printer.MainboardIP, Status: "Offline", Image: ((Printer.BrandName||"")+Printer.MachineName).replace(/ /g,"") + ".png"});
 	PrinterDIV.SetNetwork("Disconnected");
+	PrinterDIV.classList.add("Inactive");
+	PrinterDIV.Printer = Printer;
 
 	//Open up the files dialog (must be V3.0.0)
 	PrinterDIV.querySelector(".Tools .PrinterFiles").addEventListener("click", () =>
@@ -184,31 +185,38 @@ async function AddPrinter(Printer)
 
 	//Update status (broadcast for quick one)
 	console.log(`Asking printer ${Printer.Name} at ${Printer.MainboardIP} for status`);
-	var Status = await Printer.Broadcast();
-	console.log(`    ` + JSON.stringify(Status, undefined, "\t").replace(/\n/g, "\n    "));
-	if (Status.Status)
-	switch(Status.Status.CurrentStatus)
+	try
 	{
-		case SDCP.Constants.SDCP_MACHINE_STATUS.IDLE:
-			PrinterDIV.SetStatus("Idling");
-			break;
-		case SDCP.Constants.SDCP_MACHINE_STATUS.PRINTING:
-			PrinterDIV.SetStatus("Printing");
-			break;
-		default:
-			PrinterDIV.SetStatus(`Unknown ${Status.Status.CurrentStatus}`);
+		var Status = await Printer.Broadcast({Timeout: 5000});
+		//console.log(`    ` + JSON.stringify(Status, undefined, "\t").replace(/\n/g, "\n    "));
+		if (Status.Status)
+		switch(Status.Status.CurrentStatus)
+		{
+			case SDCP.Constants.SDCP_MACHINE_STATUS.IDLE:
+				PrinterDIV.SetStatus("Idling");
+				break;
+			case SDCP.Constants.SDCP_MACHINE_STATUS.PRINTING:
+				PrinterDIV.SetStatus("Printing");
+				break;
+			default:
+				PrinterDIV.SetStatus(`Unknown ${Status.Status.CurrentStatus}`);
+		}
+	}catch(err)
+	{
+		console.error(err);
 	}
 
 	//Now tap into the printer things
-	Printer.on("disconnect", () => {PrinterDIV.SetNetwork("Disconnected");});
-	Printer.on("connected",    () => {PrinterDIV.SetNetwork("Connected");});
-	Printer.on("reconnected",    () => {PrinterDIV.SetNetwork("Reconnected");});
+	Printer.on("disconnected",   () => {console.log(`${Printer.MainboardIP} disconnected event`); PrinterDIV.SetNetwork("Disconnected");	PrinterDIV.SetStatus("Offline"); PrinterDIV.classList.add("Inactive");});
+	Printer.on("connected",      () => {console.log(`${Printer.MainboardIP} connected event`   ); PrinterDIV.SetNetwork("Connected");		PrinterDIV.classList.remove("InactiveInactive");});
+	Printer.on("reconnected",    () => {console.log(`${Printer.MainboardIP} reconnected event` ); PrinterDIV.SetNetwork("Reconnected");		Printer.SendCommand(new SDCP.SDCPCommand.SDCPCommandStatus()); Printer.SendCommand(new SDCP.SDCPCommand.SDCPCommandAttributes());});
 
-	//Connect to it
+	//Connect to it)
+	console.log(`Connect to printer ${Printer.Name} at ${Printer.MainboardIP}`);
 	Printer.AutoReconnect = true;
 	Printer.Connect().then(async () =>
 	{
-		console.log(`Connected to printer ${Printer.Name} at ${Printer.MainboardIP}`);
+		console.log(`    Connected to printer ${Printer.Name} at ${Printer.MainboardIP}`);
 		//V3.0.0 should force a status and attributes request manually
 		if (Printer.ProtocolVersion === "V3.0.0")
 		{
@@ -223,7 +231,7 @@ async function AddPrinter(Printer)
 		Printer.on("status", async (Status) =>
 		{
 			//Status
-			console.log({Machine: Printer.MainboardIP, ...Status});
+			//console.log({Machine: Printer.MainboardIP, ...Status});
 			switch(Status.CurrentStatus[0])
 			{
 				case SDCP.Constants.SDCP_MACHINE_STATUS.IDLE:
@@ -259,7 +267,11 @@ async function AddPrinter(Printer)
 						let UploadedAmount = parseInt(Status.FileTransferInfo.DownloadOffset / Status.FileTransferInfo.FileTotalSize * 100);
 						PrinterDIV.querySelector(".Uploaded").style.width = UploadedAmount + "%";
 					}*/
-					break;					
+					break;	
+				case SDCP.Constants.SDCP_MACHINE_STATUS.EXPOSURE_TESTING:
+				case SDCP.Constants.SDCP_MACHINE_STATUS.DEVICES_TESTING:
+					PrinterDIV.SetStatus("Testing");
+					break;				
 				default:
 					PrinterDIV.SetStatus(`Unknown (${Status.CurrentStatus[0]})`);
 			}
@@ -316,7 +328,7 @@ async function GetFiles(Printer, path)
 		Entry.className = "Item";
 		Entry.fullPath = file.name;
 		Entry.filetype = file.type;
-		Entry.innerHTML = `<i class="fa-solid fa-${file.type === 0 ? "folder" : "file"}"></i><span>${file.name.split("/").reverse()[0]}</span>${file.type === 1 ? `<i class="fa-solid fa-print"></i>`:``}${path !== "" ? `<i class="fa-solid fa-trash"></i>`:``}`;
+		Entry.innerHTML = `<i class="Icon fa-solid fa-${file.type === 0 ? "folder" : "file"}"></i><span>${file.name.split("/").reverse()[0]}</span>${file.type === 1 ? `<i class="fa-solid fa-print"></i>`:``}${path !== "" ? `<i class="fa-solid fa-trash"></i>`:``}`;
 		Entry.title = file.name;
 
 		//Click it to go into the folder
